@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
 
+
+
 def main():
 
     driver = webdriver.Chrome()
