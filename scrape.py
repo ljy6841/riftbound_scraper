@@ -18,8 +18,9 @@ def gallery():
 
     cardLinks = soup.find_all('a', class_="sc-b988531e-0 bvEIZU sc-d043b2-0 bZMlAb")
 
+    TEST_NUMBER = 10
 
-    cardLinks = cardLinks[:10]
+    cardLinks = cardLinks[:TEST_NUMBER]
 
     for cardLink in cardLinks:
         link = "https://riftbound.leagueoflegends.com/en-us/card-gallery/" + cardLink.get("href")
@@ -29,10 +30,25 @@ def gallery():
         card_content = BeautifulSoup(card_html_content, 'lxml')
 
         cardInfo = card_content.find('div', class_="sc-60585fca-0 liHgjL")
-        cardCost = cardInfo.div.div.div.p.text
 
-        #print(cardInfo.prettify())
-        print(cardCost)
+        headerList = cardInfo.find_all('h6', recursive=True)
+        infoList = []
+        combinedList = []
+
+        for header in headerList:
+            current = header.parent
+            infoList.append(current.find_all('p', recursive=True))
+
+        for i in range(len(headerList)):
+            headerList[i] = headerList[i].text
+            
+            #comment these two out to access icons
+            for j in range(len(infoList[i])):
+                infoList[i][j] = infoList[i][j].text
+            
+            combinedList.append((headerList[i], infoList[i]))
+            
+        print(combinedList)
         driver.back()
         time.sleep(0.5)
 
