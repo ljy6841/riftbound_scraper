@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from bs4.element import NavigableString
 from selenium import webdriver
 import time
 
@@ -18,7 +19,7 @@ def gallery():
 
     cardLinks = soup.find_all('a', class_="sc-b988531e-0 bvEIZU sc-d043b2-0 bZMlAb")
 
-    TEST_NUMBER = 10
+    TEST_NUMBER = 20
 
     cardLinks = cardLinks[:TEST_NUMBER]
 
@@ -31,24 +32,34 @@ def gallery():
 
         cardInfo = card_content.find('div', class_="sc-60585fca-0 liHgjL")
 
+        # find all headers
         headerList = cardInfo.find_all('h6', recursive=True)
         infoList = []
         combinedList = []
 
+        # find all info blocks
         for header in headerList:
             current = header.parent
             infoList.append(current.find_all('p', recursive=True))
 
+        # convert headers and info to text
         for i in range(len(headerList)):
             headerList[i] = headerList[i].text
-            
-            #comment these two out to access icons
+
+            # process text and images together in descriptions
             for j in range(len(infoList[i])):
-                infoList[i][j] = infoList[i][j].text
+                fullString = ""
+                for item in infoList[i][j]:
+                    if item.name == 'img':
+                        fullString += " " + "_".join(item['class'][1].split("_")[1:]) + " "
+                    elif item.name == None and item.strip():
+                        fullString += item.strip()
+                infoList[i][j] = fullString
             
             combinedList.append((headerList[i], infoList[i]))
             
         print(combinedList)
+        print()
         driver.back()
         time.sleep(0.5)
 
